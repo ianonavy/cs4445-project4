@@ -1,0 +1,31 @@
+@relation 'cars-weka.filters.unsupervised.attribute.Remove-R3,5-weka.filters.unsupervised.instance.Resample-S1-Z2.0'
+
+@attribute buying {vhigh,high,med,low}
+@attribute maint {vhigh,high,med,low}
+@attribute persons {2,4,more}
+@attribute safety {low,med,high}
+@attribute class {unacc,acc,good}
+
+@data
+med,vhigh,more,low,unacc
+med,vhigh,2,med,unacc
+vhigh,vhigh,more,med,unacc
+med,high,4,low,unacc
+high,med,4,high,good
+low,med,2,med,unacc
+low,high,2,high,unacc
+low,vhigh,more,med,acc
+med,vhigh,4,med,acc
+med,vhigh,4,med,acc
+vhigh,vhigh,4,med,unacc
+med,med,more,med,acc
+med,vhigh,2,med,unacc
+med,med,4,low,unacc
+med,vhigh,more,low,unacc
+med,low,4,med,acc
+high,low,2,high,unacc
+high,med,4,low,unacc
+med,low,4,low,unacc
+high,high,4,low,unacc
+low,med,4,high,good
+low,low,2,high,unacc
