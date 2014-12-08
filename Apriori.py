@@ -1,4 +1,4 @@
-from ArffReader import ArffReader
+from arff import ArffReader
 from collections import defaultdict
 import itertools
 
@@ -22,12 +22,12 @@ def checkSupport(tups, dataSet, minSupportCount):
                 truthVal = False
             elif attr == 'class' and classTarget != value:
                 truthVal = False
-           
+
         if truthVal == True:
             count = count + 1
-    return count >= minSupportCount        
-     
-                    
+    return count >= minSupportCount
+
+
 
 def isOneDifferent(cands1, cands2, level):
     isTrue = True
@@ -40,7 +40,7 @@ def isOneDifferent(cands1, cands2, level):
     if attr1 == attr2:
         isTrue = False;
     return isTrue
-            
+
 def mergeTups(cands1, cands2, level):
     tups = []
     #first k-1 are the same
@@ -65,8 +65,8 @@ def isValidNewTuple(tups, level, candidates, notSupported, dataSet):
     else:
         notSupported.append(tups)
         return False
-    
-    
+
+
 
 def createNextLevel(candidates, notSupported, level, dataSet):
     prevCandidates = candidates[level-1]
@@ -80,12 +80,12 @@ def createNextLevel(candidates, notSupported, level, dataSet):
                 if(isValidNewTuple(newTuples, level, candidates,
                                  notSupported, dataSet)):
                     candidates[level].append(newTuples)
-                
+
 
 def apriori(inData, minSupportCount):
     # first create the set from initial data
     attributes = inData.attributes
-    dataSet = inData.to_list_of_lists()
+    dataSet = inData.instances
     candidatesSet = {}
     notSupported = []
     k = 1
@@ -114,6 +114,6 @@ def apriori(inData, minSupportCount):
 
 if __name__ == '__main__':
     # Example
-    inData = ArffReader(open('data.arff'))
+    inData = ArffReader(open('data.arff'), keep_target=True)
     minSupportCount = 3
     apriori(inData, minSupportCount)

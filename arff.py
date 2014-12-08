@@ -4,16 +4,22 @@ from collections import Counter
 class ArffReader(object):
     """Parser for arff files."""
 
-    def __init__(self, arff_file):
-        """Initializes a reader with arff file."""
+    def __init__(self, arff_file, keep_target=False):
+        """Initializes a reader with arff file.
+
+        :param arff_file: File-like object for arff file
+        :param keep_target: Whether or not to keep target in the list of
+            attributes"""
         self.arff_file = arff_file
         self.attributes = {}
         self.instances = []
         self.data = []  # same as instances but as list of dicts
         self.target_counts = Counter()
-        self.parse()
+        self._parse()
+        if not keep_target:
+            del self.attributes[self.target]
 
-    def parse(self):
+    def _parse(self):
         in_data = False
         attributes_order = []  # more efficient than collections.OrderedDict
         for line in self.arff_file:
@@ -38,7 +44,6 @@ class ArffReader(object):
             elif '@data' in line:
                 in_data = True
 
-        del self.attributes[self.target]
 
 
 if __name__ == '__main__':
