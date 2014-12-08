@@ -5,6 +5,8 @@ import itertools
 # a set of arrays of tuples(attribute, value) is used as the data structure
 # in order to store all the data needed.
 
+globalHashSupport = []
+
 # checkSupport checks if the conditions sent in tups have enough support
 # (1.3.3) implementation
 def checkSupport(tups, dataSet, minSupportCount):
@@ -27,7 +29,11 @@ def checkSupport(tups, dataSet, minSupportCount):
 
         if truthVal == True:
             count = count + 1
-    return count >= minSupportCount
+    if count >= minSupportCount:
+        globalHashSupport.append((tups,count))
+        return True
+    else:
+        return False
 
 
 
@@ -92,6 +98,10 @@ def createNextLevel(candidates, notSupported, level, dataSet):
                     candidates[level].append(newTuples)
 
 
+def printHashSupport():
+    for tups, support in globalHashSupport:
+        print(tups, support)
+
 # function with the main intelligence
 def apriori(inData, minSupportCount):
     # first create the set from initial data
@@ -117,15 +127,83 @@ def apriori(inData, minSupportCount):
         candidatesSet[k] = []
         createNextLevel(candidatesSet, notSupported, k, dataSet)
 
-    print('------------')
-    print('valid subsets ')
-    print(candidatesSet)
-    print('not supported')
-    print(notSupported)
+    printHashSupport()
+    
+    return candidatesSet
+
+def calculateSupport(tups, dataSet):
+    count = 0
+    #first get a line from the dataset
+    for buying, maint, persons, safety, classTarget in dataSet:
+        # now check if the all values are in the line
+        truthVal = True
+        for attr,value in tups:
+            if attr == 'buying' and buying != value:
+                truthVal = False
+            elif attr == 'maint' and maint != value:
+                truthVal = False
+            elif attr == 'persons' and persons != value:
+                truthVal = False
+            elif attr == 'safety' and safety != value:
+                truthVal = False
+            elif attr == 'class' and classTarget != value:
+                truthVal = False
+
+        if truthVal == True:
+            count = count + 1
+    return count
+
+def solveFormulas(inData):
+    dataSet = inData.instances
+    dsLen = len(dataSet)
+    #first pick the first 2 possible rules
+    tups1, sup1 = globalHashSupport[1]
+    tups2, sup2 = globalHashSupport[7]
+    # make the rule tups1 => tups2
+    supportTups = []
+    for tup in tups1:
+        supportTups.append(tup)
+    for tup in tups2:
+        supportTups.append(tup)
+    overallSupport = calculateSupport(supportTups, dataSet)
+    confidence = float(overallSupport)/sup2
+    leverage = float(overallSupport)/len(dataSet) -( float(sup1)/dsLen * float(sup2)/dsLen )
+    convDenom = float(sup1)/dsLen * (dsLen - sup2)/dsLen
+    convNom = float(sup1)/dsLen * float(9)/dsLen # 9 literally from counting
+    conviction = convDenom/convNom
+    print "----------------------------"
+    print str(tups1) + " ==> " + str(tups2)
+    print "confidence: " + str(confidence)
+    print "leverage:" + str(leverage)
+    print "conviction:" + str(conviction)
+
+def solveThirdTask(inData):
+    dataSet = inData.instances
+    dsLen = len(dataSet)
+    tups1, sup1 = globalHashSupport[len(globalHashSupport) - 1]
+    for tups2, sup2 in globalHashSupport:
+        if len(tups2) == 2:
+            supportTups = []
+            for tup in tups1:
+                supportTups.append(tup)
+            for tup in tups2:
+                supportTups.append(tup)
+            overallSupport = calculateSupport(supportTups, dataSet)
+            confidence = float(overallSupport)/sup2
+            leverage = float(overallSupport)/len(dataSet) -( float(sup1)/dsLen * float(sup2)/dsLen )
+            print "----------------------------"
+            print str(tups1) + " ==> " + str(tups2)
+            print "confidence: " + str(confidence)
+            print "leverage:" + str(leverage)
+            
+            
 
 
+    
 if __name__ == '__main__':
     # Example
     inData = ArffReader(open('data.arff'), keep_target=True)
     minSupportCount = 3
-    apriori(inData, minSupportCount)
+    candidatesSet = apriori(inData, minSupportCount)
+    solveFormulas(inData)
+    solveThirdTask(inData)
