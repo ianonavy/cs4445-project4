@@ -9,5 +9,5 @@ Requirements: python 3+ (comes with most UNIX-based systems)
 
 ### RIPPER
 
-    python3 ripper.py
+    python3 ripper.py data.arff
 

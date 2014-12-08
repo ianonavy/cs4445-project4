@@ -1,3 +1,4 @@
+import sys
 from arff import ArffReader
 from math import log
 
@@ -124,7 +125,9 @@ class Ripper(object):
 
 
 def main():
-    reader = ArffReader(open('data.arff'))
+    if len(sys.argv) < 2:
+        sys.exit("Usage: {} <filename>".format(sys.argv[0]))
+    reader = ArffReader(open(sys.argv[1]))
     ripper = Ripper(reader)
     print("\nFirst rule: {}".format(ripper.first_rule()))
 
