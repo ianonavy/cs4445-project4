@@ -5,6 +5,8 @@ import itertools
 # a set of arrays of tuples(attribute, value) is used as the data structure
 # in order to store all the data needed.
 
+# checkSupport checks if the conditions sent in tups have enough support
+# (1.3.3) implementation
 def checkSupport(tups, dataSet, minSupportCount):
     count = 0
     #first get a line from the dataset
@@ -29,12 +31,17 @@ def checkSupport(tups, dataSet, minSupportCount):
 
 
 
+# this function implements the (1.3.1) "join" condition. it checks that the
+# first k-1 elements are identical and that the last ones don't have the
+# same attribute with a different value, but a completely different attribute
 def isOneDifferent(cands1, cands2, level):
+    # check for first k-1
     isTrue = True
     for i in range(level-1):
         if cands1[i] != cands2[i]:
             isTrue = False
 
+    # check that kth is from different attribute
     attr1, val1 = cands1[level - 1]
     attr2, val2 = cands2[level - 1]
     if attr1 == attr2:
@@ -51,6 +58,8 @@ def mergeTups(cands1, cands2, level):
     tups.append(cands2[level-1])
     return tups
 
+# (1.3.2) this solves the subset condition by going to the combinations and making
+# sure there are no smaller subsets included that don't already have support
 def isValidNewTuple(tups, level, candidates, notSupported, dataSet):
     # check if any subset is among not supported ones
     for i in range(level):
@@ -60,14 +69,15 @@ def isValidNewTuple(tups, level, candidates, notSupported, dataSet):
                 return False
 
     # got here means all subsets are valid
-    if checkSupport(tups, dataSet, 3): # TODO 3 from minSupportCount
+    # add to not supported if the count is not good enough
+    if checkSupport(tups, dataSet, 3):
         return True
     else:
         notSupported.append(tups)
         return False
 
 
-
+# creates the next level based on the previous ones
 def createNextLevel(candidates, notSupported, level, dataSet):
     prevCandidates = candidates[level-1]
     for i in range(len(prevCandidates)):
@@ -82,6 +92,7 @@ def createNextLevel(candidates, notSupported, level, dataSet):
                     candidates[level].append(newTuples)
 
 
+# function with the main intelligence
 def apriori(inData, minSupportCount):
     # first create the set from initial data
     attributes = inData.attributes
@@ -100,6 +111,7 @@ def apriori(inData, minSupportCount):
             else:
                 notSupported.append(tups)
     # now combine them and create higher order
+    # stop condition: when there are no more rules to create
     while candidatesSet[k] != []:
         k += 1
         candidatesSet[k] = []

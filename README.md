@@ -11,6 +11,8 @@ Requirements: python 3+ (comes with most UNIX-based systems)
 
     python3 ripper.py data.arff
 
+1. Classification Rules using RIPPER
+
 1. You can see the step-by-step in this sample output:
 
     Calculating first rule.
@@ -70,3 +72,41 @@ where p is the number of positive examples covered by the first rule in the
 validation set, and n is the number of negative examples. It then calculates
 this metric for each final sequence of conditions and keeps the pruned version
 which maximizes the metric.
+
+
+---------------------------------------------------------
+
+
+2. Association rules using Apriori
+
+1.1. The "join condition" is the condition needed to be satisfied in the Fk-1xFk-1
+in order to be able to merge the two subsets. Basically it goes through the first
+k-2 elements for each subset and if they are not the same, they do not obey the
+"join" condition. If they are the same, check that the k-1 element is different
+for each of the subsets (not having the same attribute with differnet values).
+If this conditions are obeyed, then the condition is satisfied
+
+1.2. The subset condition is the condition that makes sure that after merging, the
+obtained subset does not contain combinations of other subsets that were already
+checked not to have enough support. This makes sure that the counting doesn't
+start before all the pruning has been done which minimizes the number of times it
+is needed to go through all the elements in the dataset and therefore reduces the
+time make the computations
+
+1.3. In general, a level is computed in the function createNextLevel() in the Apriori.py.
+1.3.1 The join condition has been implemented in the function isOneDifferent(), which
+takes 2 subsets and check if they obey the join condition as it was described at 1.
+1.3.2 The subset conditoin is checked in the function isValidNewTuple(). This function
+takes the combinations of the the subsets of the newly created subset and makes sure
+they have not already been categorized as not having enough support. Only if this
+condition doesn't hold, then compute the support.
+1.3.3 The support for remaining itemsets is taken care of in the function checkSupport()
+which loops through all the data instances and checks if there is an expected match.
+
+1.4 The termination condition can be found in the while loop of the function apriori().
+The generation will stop when there is a level that doesn't have any rules with enough
+support. 
+
+2. lift = confidence / prob(consequence) = confidence/(consequnceCount/totalTransactions)
+   leverage = prob(premise & consequence) - (prob(premise) * prob(consequence))
+   conviction = prob(premise) * prob(!consequence) / prob(premise & !consequence)
