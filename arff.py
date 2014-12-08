@@ -7,21 +7,21 @@ class ArffReader(object):
     def __init__(self, arff_file):
         """Initializes a reader with arff file."""
         self.arff_file = arff_file
+        self.attributes = {}
+        self.instances = []
+        self.data = []  # same as instances but as list of dicts
+        self.target_counts = Counter()
         self.parse()
 
     def parse(self):
         in_data = False
-        attributes = {}
         attributes_order = []  # more efficient than collections.OrderedDict
-        instances = []
-        data = []
-        self.target_counts = Counter()
         for line in self.arff_file:
             line = line.strip()
             if in_data:
                 instance = line.split(',')
-                instances.append(instance)
-                data.append(dict(zip(attributes_order, instance)))
+                self.instances.append(instance)
+                self.data.append(dict(zip(attributes_order, instance)))
                 self.target_counts[instance[-1]] += 1
             if '@relation' in line:
                 name = line.split()[1]
@@ -32,15 +32,12 @@ class ArffReader(object):
                 if values != 'numeric':
                     values_no_brackets = values[1:-1]
                     values = values_no_brackets.split(',')
-                attributes[name] = values
+                self.attributes[name] = values
                 attributes_order.append(name)
                 self.target = name  # always last one
             elif '@data' in line:
                 in_data = True
 
-        self.attributes = attributes
-        self.instances = instances
-        self.data = data
         del self.attributes[self.target]
 
 
